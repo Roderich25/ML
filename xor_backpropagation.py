@@ -4,13 +4,14 @@ import numpy as np
 alpha = 0.1
 
 # XOR Logical Table
-x = np.array([-1, 1, 1])
-y = np.array([0])
+input = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+expected_output = np.array([[0], [1], [1], [0]])
 
 # Initial values
-w_h1 = np.array([0.8, 0.5, 0.4])
-w_h2 = np.array([-0.1, 0.9, 1.0])
-w_out = np.array([0.3, -1.2, 1.1])
+w_hly = np.random.uniform(size=(2, 2))
+b_hly = [[-1, -1]]  # np.random.uniform(size=(1, 2))
+w_out = np.random.uniform(size=(2, 1))
+b_out = [-1]  # np.random.uniform(size=(1, 1))
 
 
 def ActivationFunc(h):
@@ -23,31 +24,32 @@ def ActivaitonFuncDerivative(h):
     return 1 - h ** 2  # Derivative of TanH
 
 
-def ForwardProp(x, w_h1, w_h2, w_out):
-    h1 = ActivationFunc(np.dot(x, w_h1))
-    h2 = ActivationFunc(np.dot(x, w_h2))
-    output = ActivationFunc(np.dot(np.append(-1, [h1, h2]), w_out))
-    return h1, h2, output
+def forwardProp(input, w_hly, b_hly, w_out, b_out):
+    h_activation = np.dot(input, w_hly) + b_hly
+    h_output = ActivationFunc(h_activation)
+    y_activation = np.dot(h_output, w_out) + b_out
+    y_output = ActivationFunc(y_activation)
+    return h_output, y_output
 
 
-def BackwardProp(y, x, w_h1, w_h2, w_out):
-    h1, h2, output = ForwardProp(x, w_h1, w_h2, w_out)
-    error = y - output
-
-    delta_out = error * ActivaitonFuncDerivative(output)
-    w_out += alpha * np.append(-1, [h1, h2]) * delta_out
-
-    delta_h1 = ActivaitonFuncDerivative(h1) * delta_out * w_out[1]
-    w_h1 += alpha * x * delta_h1
-
-    delta_h2 = ActivaitonFuncDerivative(h2) * delta_out * w_out[2]
-    w_h2 += alpha * x * delta_h2
-
-    return w_h1, w_h2, w_out
+def backwardProp(input, w_hly, b_hly, w_out, b_out, h_output, y_output):
+    delta_out = (expected_output - y_output) * ActivaitonFuncDerivative(y_output)
+    delta_hly = delta_out * w_out.T * ActivaitonFuncDerivative(h_output)
+    w_out += np.matmul(h_output.T, delta_out) * alpha
+    b_out += np.sum(delta_out, axis=0, keepdims=True) * alpha
+    w_hly += np.matmul(input.T, delta_hly) * alpha
+    b_hly += np.sum(delta_hly, axis=0, keepdims=True) * alpha
+    return w_hly, b_hly, w_out, b_out
 
 
-for _ in range(250):
-    w_h1, w_h2, w_out = BackwardProp(y, x, w_h1, w_h2, w_out)
-    _, _, xor = ForwardProp(x, w_h1, w_h2, w_out)
-    print(xor)
-    print(w_h1, w_h2, w_out)
+epochs = 0
+while True:
+    epochs += 1
+    h_output, y_output = forwardProp(input, w_hly, b_hly, w_out, b_out)
+    w_hly, b_hly, w_out, b_out = backwardProp(input, w_hly, b_hly, w_out, b_out, h_output, y_output)
+    if np.sum(0.5 * (y_output - expected_output) ** 2) < 0.01 or epochs > 1_000_000:
+        print(epochs)
+        break
+
+_, y_output = forwardProp(input, w_hly, b_hly, w_out, b_out)
+print(y_output)
