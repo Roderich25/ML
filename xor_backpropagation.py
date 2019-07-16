@@ -14,11 +14,13 @@ w_out = np.array([0.3, -1.2, 1.1])
 
 
 def ActivationFunc(h):
-    return 1 / (1 + np.exp(-h))  # Sigmoid function
+    # return 1 / (1 + np.exp(-h))  # Sigmoid function
+    return np.tanh(h)  # TanH
 
 
 def ActivaitonFuncDerivative(h):
-    return h * (1 - h)  # Derivative of Sigmoid Function
+    # return h * (1 - h)  # Derivative of Sigmoid Function
+    return 1 - h ** 2  # Derivative of TanH
 
 
 def ForwardProp(x, w_h1, w_h2, w_out):
@@ -26,6 +28,7 @@ def ForwardProp(x, w_h1, w_h2, w_out):
     h2 = ActivationFunc(np.dot(x, w_h2))
     output = ActivationFunc(np.dot(np.append(-1, [h1, h2]), w_out))
     return h1, h2, output
+
 
 def BackwardProp(y, x, w_h1, w_h2, w_out):
     h1, h2, output = ForwardProp(x, w_h1, w_h2, w_out)
@@ -43,7 +46,7 @@ def BackwardProp(y, x, w_h1, w_h2, w_out):
     return w_h1, w_h2, w_out
 
 
-for _ in range(5000):
+for _ in range(250):
     w_h1, w_h2, w_out = BackwardProp(y, x, w_h1, w_h2, w_out)
     _, _, xor = ForwardProp(x, w_h1, w_h2, w_out)
     print(xor)
