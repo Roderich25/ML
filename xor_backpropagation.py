@@ -27,27 +27,24 @@ def ForwardProp(x, w_h1, w_h2, w_out):
     output = ActivationFunc(np.dot(np.append(-1, [h1, h2]), w_out))
     return h1, h2, output
 
-
 def BackwardProp(y, x, w_h1, w_h2, w_out):
     h1, h2, output = ForwardProp(x, w_h1, w_h2, w_out)
     error = y - output
 
     delta_out = error * ActivaitonFuncDerivative(output)
-    dw_out = alpha * np.append(-1, [h1, h2]) * delta_out
-    w_out += dw_out
+    w_out += alpha * np.append(-1, [h1, h2]) * delta_out
 
     delta_h1 = ActivaitonFuncDerivative(h1) * delta_out * w_out[1]
-    dw_h1 = alpha * x * delta_h1
-    w_h1 += dw_h1
+    w_h1 += alpha * x * delta_h1
 
     delta_h2 = ActivaitonFuncDerivative(h2) * delta_out * w_out[2]
-    dw_h2 = alpha * x * delta_h2
-    w_h2 += dw_h2
+    w_h2 += alpha * x * delta_h2
 
     return w_h1, w_h2, w_out
 
 
 for _ in range(5000):
-    BackwardProp(y, x, w_h1, w_h2, w_out)
+    w_h1, w_h2, w_out = BackwardProp(y, x, w_h1, w_h2, w_out)
     _, _, xor = ForwardProp(x, w_h1, w_h2, w_out)
     print(xor)
+    print(w_h1, w_h2, w_out)
