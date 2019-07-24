@@ -36,7 +36,7 @@ clf = clf.fit(X_train, y_train)
 predictions = clf.predict(X_test)
 print("LogisticRegression:", accuracy_score(y_test, predictions))
 
-cldf = MLPClassifier(solver='lbfgs', activation='tanh')
+clf = MLPClassifier(solver='lbfgs', activation='tanh')
 clf = clf.fit(X_train, y_train)
 predictions = clf.predict(X_test)
 print("NeuralNetwork:", accuracy_score(y_test, predictions))
